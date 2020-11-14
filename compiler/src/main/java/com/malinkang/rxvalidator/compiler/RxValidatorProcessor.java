@@ -26,9 +26,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
-
 @AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class RxValidatorProcessor extends AbstractProcessor {
 
     Filer filer;
@@ -56,22 +55,22 @@ public class RxValidatorProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
-        Map<TypeElement,ValidationClass> classMap = new HashMap<>();
+        Map<TypeElement, ValidationClass> classMap = new HashMap<>();
 
-        for (Element element:roundEnvironment.getElementsAnnotatedWith(NotEmpty.class)){
-            parseNotEmpty(element,classMap);
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(NotEmpty.class)) {
+            parseNotEmpty(element, classMap);
         }
 
-        for (Element element:roundEnvironment.getElementsAnnotatedWith(MaxLength.class)){
-            parseMaxLength(element,classMap);
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(MaxLength.class)) {
+            parseMaxLength(element, classMap);
         }
 
-        for (Element element:roundEnvironment.getElementsAnnotatedWith(MinLength.class)){
-            parseMinLength(element,classMap);
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(MinLength.class)) {
+            parseMinLength(element, classMap);
         }
 
-        for (Element element:roundEnvironment.getElementsAnnotatedWith(RegExp.class)){
-            parseRegExp(element,classMap);
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(RegExp.class)) {
+            parseRegExp(element, classMap);
         }
 
         for (Map.Entry<TypeElement, ValidationClass> entry : classMap.entrySet()) {
@@ -87,79 +86,80 @@ public class RxValidatorProcessor extends AbstractProcessor {
         return true;
     }
 
-    public void parseNotEmpty(Element element,Map<TypeElement,ValidationClass> validationClassMap){
+    //解析NotEmpty
+    public void parseNotEmpty(Element element, Map<TypeElement, ValidationClass> validationClassMap) {
+        //父Element
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
         VariableElement variableElement = (VariableElement) element;
-        NotEmpty notEmpty=element.getAnnotation(NotEmpty.class);
+        NotEmpty notEmpty = element.getAnnotation(NotEmpty.class);
         int order = notEmpty.order();
         String message = notEmpty.message();
         boolean trim = notEmpty.trim();
         ValidationClass validationClass = validationClassMap.get(enclosingElement);
-        if(validationClass==null){
+        if (validationClass == null) {
             validationClass = new ValidationClass(enclosingElement);
-            validationClassMap.put(enclosingElement,validationClass);
+            validationClassMap.put(enclosingElement, validationClass);
         }
-        ValidationField validationField=validationClass.getField(variableElement);
-        Validation validation = new Validation(Validation.NOTEMPTY,order,message,validationField.getName());
-        validation.addParam("trim",trim);
+        ValidationField validationField = validationClass.getField(variableElement);
+        Validation validation = new Validation(Validation.NOTEMPTY, order, message, validationField.getName());
+        validation.addParam("trim", trim);
         validationField.addValidation(validation);
 
     }
 
-
-    public void parseMaxLength(Element element,Map<TypeElement,ValidationClass> validationClassMap){
+    public void parseMaxLength(Element element, Map<TypeElement, ValidationClass> validationClassMap) {
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
         VariableElement variableElement = (VariableElement) element;
-        MaxLength maxLength=element.getAnnotation(MaxLength.class);
+        MaxLength maxLength = element.getAnnotation(MaxLength.class);
         int order = maxLength.order();
         String message = maxLength.message();
         int length = maxLength.length();
         ValidationClass validationClass = validationClassMap.get(enclosingElement);
-        if(validationClass==null){
+        if (validationClass == null) {
             validationClass = new ValidationClass(enclosingElement);
-            validationClassMap.put(enclosingElement,validationClass);
+            validationClassMap.put(enclosingElement, validationClass);
         }
-        ValidationField validationField=validationClass.getField(variableElement);
-        Validation validation = new Validation(Validation.MAXLENGTH,order,message,validationField.getName());
-        validation.addParam("length",length);
+        ValidationField validationField = validationClass.getField(variableElement);
+        Validation validation = new Validation(Validation.MAXLENGTH, order, message, validationField.getName());
+        validation.addParam("length", length);
         validationField.addValidation(validation);
 
     }
 
-    public void parseMinLength(Element element,Map<TypeElement,ValidationClass> validationClassMap){
+    public void parseMinLength(Element element, Map<TypeElement, ValidationClass> validationClassMap) {
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
         VariableElement variableElement = (VariableElement) element;
-        MinLength minLength=element.getAnnotation(MinLength.class);
+        MinLength minLength = element.getAnnotation(MinLength.class);
         int order = minLength.order();
         String message = minLength.message();
         int length = minLength.length();
         ValidationClass validationClass = validationClassMap.get(enclosingElement);
-        if(validationClass==null){
+        if (validationClass == null) {
             validationClass = new ValidationClass(enclosingElement);
-            validationClassMap.put(enclosingElement,validationClass);
+            validationClassMap.put(enclosingElement, validationClass);
         }
-        ValidationField validationField=validationClass.getField(variableElement);
-        Validation validation = new Validation(Validation.MINLENGTH,order,message,validationField.getName());
-        validation.addParam("length",length);
+        ValidationField validationField = validationClass.getField(variableElement);
+        Validation validation = new Validation(Validation.MINLENGTH, order, message, validationField.getName());
+        validation.addParam("length", length);
         validationField.addValidation(validation);
 
     }
 
-    public void parseRegExp(Element element,Map<TypeElement,ValidationClass> validationClassMap){
+    public void parseRegExp(Element element, Map<TypeElement, ValidationClass> validationClassMap) {
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
         VariableElement variableElement = (VariableElement) element;
-        RegExp regExp=element.getAnnotation(RegExp.class);
+        RegExp regExp = element.getAnnotation(RegExp.class);
         int order = regExp.order();
         String message = regExp.message();
         String regexp = regExp.regexp();
         ValidationClass validationClass = validationClassMap.get(enclosingElement);
-        if(validationClass==null){
+        if (validationClass == null) {
             validationClass = new ValidationClass(enclosingElement);
-            validationClassMap.put(enclosingElement,validationClass);
+            validationClassMap.put(enclosingElement, validationClass);
         }
-        ValidationField validationField=validationClass.getField(variableElement);
-        Validation validation = new Validation(Validation.REGEXP,order,message,validationField.getName());
-        validation.addParam("regexp",regexp);
+        ValidationField validationField = validationClass.getField(variableElement);
+        Validation validation = new Validation(Validation.REGEXP, order, message, validationField.getName());
+        validation.addParam("regexp", regexp);
         validationField.addValidation(validation);
 
     }

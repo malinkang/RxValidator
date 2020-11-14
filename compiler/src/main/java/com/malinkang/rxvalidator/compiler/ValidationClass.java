@@ -41,7 +41,7 @@ public class ValidationClass {
 
     private TypeName typeName;
     private ClassName validatorClassName;
-    private Map<VariableElement, ValidationField> fieldMap;
+    private Map<VariableElement, ValidationField> fieldMap; //存储字段
 
     public ValidationClass(TypeElement enclosingElement) {
         typeName = TypeName.get(enclosingElement.asType());
@@ -64,7 +64,7 @@ public class ValidationClass {
 
     JavaFile brewJava() {
         return JavaFile.builder(validatorClassName.packageName(), createType())
-                .addFileComment("Generated code from Butter Knife. Do not modify!")
+                .addFileComment("Generated code from RxValidator. Do not modify!")
                 .build();
     }
 
